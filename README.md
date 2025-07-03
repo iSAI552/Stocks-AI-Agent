@@ -1,1 +1,1 @@
-# AI-Agent for Stock anlaysis thorough a complete worflow using concepts of RAG and Agentic pipelines
+# AI Agent for Stock Analysis through a Complete Workflow using RAG and Agentic Pipeline Concepts
