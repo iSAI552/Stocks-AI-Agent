@@ -1,0 +1,242 @@
+[
+  {
+    "name": "Reliance Industries",
+    "symbol": "RELIANCE",
+    "cap": "large",
+    "sector": "Energy & Petrochemicals",
+    "description": "Diversified across refining, petrochemicals, retail & Jio; strong leadership under Ambani, strategic govt aligned infra & defence push."
+  },
+  {
+    "name": "HDFC Bank",
+    "symbol": "HDFCBANK",
+    "cap": "large",
+    "sector": "Banking",
+    "description": "India's largest private bank; robust asset quality since 1994; benefits from rising credit demand, regulated by RBI as D-SIB."
+  },
+  {
+    "name": "TCS",
+    "symbol": "TCS",
+    "cap": "large",
+    "sector": "IT Services",
+    "description": "Global IT leader in digital/cloud; strong cash flows and disciplined acquisitions; sensitive to global tech cycles."
+  },
+  {
+    "name": "Infosys",
+    "symbol": "INFY",
+    "cap": "large",
+    "sector": "IT Services",
+    "description": "Major IT exporter with growth in digital/analytics; steady management, though macros in US/Europe affect performance."
+  },
+  {
+    "name": "Hindustan Unilever",
+    "symbol": "HINDUNILVR",
+    "cap": "large",
+    "sector": "FMCG",
+    "description": "Leading consumer staples brand; stable margins, rural reach; regulated pricing and commodity inflation impact earnings."
+  },
+  {
+    "name": "ITC",
+    "symbol": "ITC",
+    "cap": "large",
+    "sector": "FMCG & Tobacco",
+    "description": "Conglomerate in cigarettes, FMCG, agribiz and hotels; pivot from tobacco under Puri; govt taxes influence stock."
+  },
+  {
+    "name": "Larsen & Toubro",
+    "symbol": "LT",
+    "cap": "large",
+    "sector": "Engineering & Construction",
+    "description": "Indias leading infra/defence builder since 1946; wins govt metro/space projects; execution risk remains."
+  },
+  {
+    "name": "Bharti Airtel",
+    "symbol": "BHARTIARTL",
+    "cap": "large",
+    "sector": "Telecom",
+    "description": "Second largest telecom with strong 5G rollout; expansion in Africa; pricing & regulatory clarity matter."
+  },
+  {
+    "name": "Bajaj Auto",
+    "symbol": "BAJAJ-AUTO",
+    "cap": "large",
+    "sector": "Automobiles",
+    "description": "Two wheeler exporter with Juvenile performance cycles; benefits from rural demand & FX tailwinds."
+  },
+  {
+    "name": "Divi's Laboratories",
+    "symbol": "DIVISLAB",
+    "cap": "large",
+    "sector": "Pharma",
+    "description": "CRAMS provider to global pharma; high margins and consistent growth; US FDA approvals drive valuation."
+  },
+  {
+    "name": "Hindustan Aeronautics",
+    "symbol": "HAL",
+    "cap": "large",
+    "sector": "Defence",
+    "description": "State owned defence-maker riding Modis indigenisation push (56% YoY gain); order book strong but valuations high."
+  },
+  {
+    "name": "Eicher Motors",
+    "symbol": "EICHERMOT",
+    "cap": "large",
+    "sector": "Automobiles",
+    "description": "Royal Enfield maker; premium motorcycle demand strong; commodity costs & rural slowdown are caution points."
+  },
+  {
+    "name": "Infosys Edge (Info Edge)",
+    "symbol": "NAUKRI",
+    "cap": "large",
+    "sector": "Internet Services",
+    "description": "Online classifieds leader (jobs/real estate); strong cash, minor govt rules on hiring data may impact."
+  },
+  {
+    "name": "NTPC",
+    "symbol": "NTPC",
+    "cap": "large",
+    "sector": "Power",
+    "description": "State run power generator; stable earnings, linked to govts renewable scaling; FX on coal imports matters."
+  },
+  {
+    "name": "ICICI Bank",
+    "symbol": "ICICIBANK",
+    "cap": "large",
+    "sector": "Banking",
+    "description": "Private bank with growing digital base; improving asset quality; RBI regulations tighten loan norms periodic."
+  },
+
+  {
+    "name": "Polycab India",
+    "symbol": "POLYCAB",
+    "cap": "mid",
+    "sector": "Electrical Equipment",
+    "description": "Largest wires/cables maker; branched into fans/LED; solid execution but tax searches pose occasional volatility."
+  },
+  {
+    "name": "Cummins India",
+    "symbol": "CUMMINSIND",
+    "cap": "mid",
+    "sector": "Industrial Engines",
+    "description": "Diesel/gas engine leader; tied to infra, heavy duty engine cycles; aftermarket gives stability."
+  },
+  {
+    "name": "Coforge",
+    "symbol": "COFORGE",
+    "cap": "mid",
+    "sector": "IT Services",
+    "description": "Boutique digital transformation IT player; strong growth (~25% RoE); sensitive to global IT spend."
+  },
+  {
+    "name": "Alkem Laboratories",
+    "symbol": "ALKEM",
+    "cap": "mid",
+    "sector": "Pharma",
+    "description": "Nifty Midcap 100 pharma with domestic & export presence; R&D led; US approvals are key catalyst."
+  },
+  {
+    "name": "HDFC AMC",
+    "symbol": "HDFCAMC",
+    "cap": "mid",
+    "sector": "Financial Services",
+    "description": "Leading mutual fund manager; benefits from AUM expansion; flow reversals can impact EBIT margins."
+  },
+  {
+    "name": "Tata Elxsi",
+    "symbol": "TATAELXSI",
+    "cap": "mid",
+    "sector": "IT & Design",
+    "description": "Design/engineering IT in auto, healthcare; strong AI/EV tailwinds; project execution vital."
+  },
+  {
+    "name": "Crompton Greaves",
+    "symbol": "CROMPTON",
+    "cap": "mid",
+    "sector": "Consumer Electricals",
+    "description": "Home appliances/lighting player; market share leader; input cost pressures may dent margins."
+  },
+  {
+    "name": "Mazagon Dock Shipbuilders",
+    "symbol": "MAZDOCK",
+    "cap": "mid",
+    "sector": "Shipbuilding",
+    "description": "Defence shipyard with govt contracts; benefits from indigenisation; execution & cost overruns are risks."
+  },
+  {
+    "name": "Hindustan Zinc",
+    "symbol": "HINDZINC",
+    "cap": "mid",
+    "sector": "Mining",
+    "description": "Top zinc producer; steady dividend payer; metal price swings drive stock movement."
+  },
+  {
+    "name": "Solar Industries India",
+    "symbol": "SOLARINDS",
+    "cap": "mid",
+    "sector": "Chemicals",
+    "description": "Explosives/chemicals for mining; cyclical but strong growth; regulatory safety norms watched."
+  },
+  {
+    "name": "Sonata Software",
+    "symbol": "SONATSOFTW",
+    "cap": "mid",
+    "sector": "IT Services",
+    "description": "SMID IT player; niche retail-tech services; dependent on client wins, currency movement matters."
+  },
+
+  {
+    "name": "Aptus Housing Finance",
+    "symbol": "APTUS",
+    "cap": "small",
+    "sector": "NBFC",
+    "description": "Home finance focused; growing AUM; asset quality sensitive to rural slowdowns."
+  },
+  {
+    "name": "Aavas Financiers",
+    "symbol": "AAVAS",
+    "cap": "small",
+    "sector": "NBFC",
+    "description": "Affordable housing finance; strong growth but high leverage increases risk."
+  },
+  {
+    "name": "CAMS",
+    "symbol": "CAMS",
+    "cap": "small",
+    "sector": "FinTech",
+    "description": "Mutual funds back office leader; sticky revenue but governed by AMCs flow; regulatory risk."
+  },
+  {
+    "name": "Data Patterns",
+    "symbol": "DATAPATTNS",
+    "cap": "small",
+    "sector": "Defence Equipments",
+    "description": "Tech systems maker for defence; benefits from indigenisation; order volatility can spike stock."
+  },
+  {
+    "name": "Indian Energy Exchange",
+    "symbol": "IEX",
+    "cap": "small",
+    "sector": "Energy Trading",
+    "description": "Power trading platform; benefits from renewable push; volume dips in demand slowdowns."
+  },
+  {
+    "name": "Five-Star Business Finance",
+    "symbol": "FIVESTAR",
+    "cap": "small",
+    "sector": "NBFC",
+    "description": "Rural consumer lender; high growth; rural economy exposure adds risk."
+  },
+  {
+    "name": "Home First Finance",
+    "symbol": "HOMEFIRST",
+    "cap": "small",
+    "sector": "NBFC",
+    "description": "Affordable-housing FinCo; rising footprint; interest rate hikes may pressure margins."
+  },
+  {
+    "name": "Aditya Vision Ltd",
+    "symbol": "AVL",
+    "cap": "small",
+    "sector": "Retail",
+    "description": "White goods retailer; debt reduction underway; broker bullish despite recent volatility."
+  }
+]
