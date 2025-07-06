@@ -60,6 +60,35 @@ def llm_call(prompt: str, model: ModelType, responseFormat: BaseModel):
 class newsResponse(BaseModel):
     news: List[str]
 
+class StockRecommendation(BaseModel):
+    symbol: str
+    expected_change: str
+    confidence: str
+    reason: str
+
+class stockRecommendationResponse(BaseModel):
+    stock_recommendations: List[StockRecommendation]
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "stock_recommendations": [
+                    {
+                        "symbol": "AAPL",
+                        "expected_change": "2.5%",
+                        "confidence": "85%",
+                        "reason": "Positive earnings report."
+                    },
+                    {
+                        "symbol": "GOOGL",
+                        "expected_change": "-1.2%",
+                        "confidence": "70%",
+                        "reason": "Regulatory concerns."
+                    }
+                ]
+            }
+        }
+
 class State(TypedDict):
     """
     Represents a state in the graph.
@@ -99,7 +128,7 @@ def get_bucket_stocks_specific_news(state: State) -> State:
     """
     Get top 10 news specific to the bucket of stocks.
     """
-    state["stock_bucket"] = bucketStocks
+    # state["stock_bucket"] = bucketStocks
     prompt_stock_specific_news = (
         "You are an Indian and US stock market authentic news aggregator and expert."
         "Provide me the top 10 news of the past 48 hours that can have impact on any of the stocks provided in the bucket."
@@ -127,6 +156,29 @@ def get_bucket_stocks_specific_news(state: State) -> State:
         state["news"].extend(news_obj.news)
     return state
 
+def map_news_to_stocks(state: State) -> State:
+    """
+    Maps the news to the stocks in the bucket.
+    """
+    if state["news"] is None:
+        raise ValueError("News array cannot be empty.")
+    
+    prompt_map_news_to_stocks = (
+        "You are an Stock Market and finance expert for Indian and US stock markets."
+        "From the given newsArray and the bucketStocks, analyze the news very deliberately and give me the top 10 stocks that are most likely to be affected by the news."
+        "The affected stocks should only be the ones present in the bucketStocks."
+        "Return the top 10 stocks in an array of objects, each object containing the stock exchange symbol, the percentage fall or rise expected today on the stock because of this, a percentage showing how confident you are on this price change, and to the point reason for its impact in 2 lines max."
+        f"newsArray: {state['news']}\n"
+        f"bucketStocks: {bucketStocks}\n"
+    )
+
+    state["stock_recommendations"] = llm_call(
+        prompt_map_news_to_stocks,
+        "gemini_main",
+        stockRecommendationResponse
+    )
+    return state
+
 graph_builder = StateGraph(State)
 
 graph_builder.add_node(
@@ -137,6 +189,11 @@ graph_builder.add_node(
 graph_builder.add_node(
     "get_bucket_stocks_specific_news",
     get_bucket_stocks_specific_news,
+)
+
+graph_builder.add_node(
+    "map_news_to_stocks",
+    map_news_to_stocks,
 )
 
 graph_builder.add_edge(
@@ -151,6 +208,11 @@ graph_builder.add_edge(
 
 graph_builder.add_edge(
     "get_bucket_stocks_specific_news",
+    "map_news_to_stocks",
+)
+
+graph_builder.add_edge(
+    "map_news_to_stocks",
     END,
 )
 
@@ -166,8 +228,8 @@ def call_graph() -> str:
         "ai_msg": "",
     }
     
-    result = graph.invoke(state)
-    return result.get("news", "No AI response generated.")
+    result: State = graph.invoke(state)
+    return result.get("stock_recommendations", "No AI response generated.")
 
 if __name__ == "__main__":
     print("Welcome to the Stock Market AI Assistant!")
