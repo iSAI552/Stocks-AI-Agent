@@ -179,6 +179,27 @@ def map_news_to_stocks(state: State) -> State:
     )
     return state
 
+def check_for_similar_past_instances(state: State) -> State:
+    """
+    Check for similar past instances of the news and see how it impacted the current list of stocks.
+    """
+    prompt_check_past_instances = (
+        "You are an Stock Market and finance expert and have deep understanding of the Indian and US Stock markets."
+        "On the basis of the NEWS_ARRAY i have some predictins in STOCK_RECOMMENDATIONS, analyze the past instances of similar news and how they impacted the specific stock i have provided or extremly similar stocks."
+        "Now if you get some similar news and based on this new data you are very confident that the stock price change will be different that what is given, then only update the STOCK_RECOMMENDATIONS with the new expected change, confidence and append your reason for the change in the reason field."
+        "Finally only return the STOCK_RECOMMENDATIONS with the updated values or if no update is required then return the same STOCK_RECOMMENDATIONS."
+        "Return the 10 stocks in an array of objects, each object containing the stock exchange symbol, the percentage fall or rise expected today on the stock, a percentage showing how confident you are on this price change now, and appended reason for its impact in 2 lines max."
+        f"NEWS_ARRAY: {state['news']}\n"
+        f"STOCK_RECOMMENDATIONS: {state['stock_recommendations']}\n"
+    )
+
+    state["stock_recommendations"] = llm_call(
+        prompt_check_past_instances,
+        "gemini_main",
+        stockRecommendationResponse
+    )
+    return state
+
 graph_builder = StateGraph(State)
 
 graph_builder.add_node(
@@ -194,6 +215,11 @@ graph_builder.add_node(
 graph_builder.add_node(
     "map_news_to_stocks",
     map_news_to_stocks,
+)
+
+graph_builder.add_node(
+    "check_for_similar_past_instances",
+    check_for_similar_past_instances,
 )
 
 graph_builder.add_edge(
@@ -213,6 +239,11 @@ graph_builder.add_edge(
 
 graph_builder.add_edge(
     "map_news_to_stocks",
+    "check_for_similar_past_instances",
+)
+
+graph_builder.add_edge(
+    "check_for_similar_past_instances",
     END,
 )
 
