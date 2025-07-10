@@ -1,0 +1,116 @@
+{
+  "company": {
+    "name": "Reliance Industries Limited",
+    "ticker": "RELIANCE",
+    "segments": [
+      "Oil to Chemicals (O2C)",
+      "Retail",
+      "Digital Services (Telecom)",
+      "Media & Entertainment",
+      "Renewable Energy"
+    ]
+  },
+  "financials": {
+    "Q4_FY25": {
+      "revenue": 264573,
+      "total_revenue": 269478,
+      "ebitda": 48737,
+      "pat": 22434,
+      "revenue_growth_yoy": 9.9,
+      "pat_growth_yoy": 6.1
+    },
+    "FY25": {
+      "revenue": 998114,
+      "total_revenue": 998114,
+      "ebitda": 183422,
+      "pat": 80787,
+      "revenue_growth_yoy": 7.3,
+      "pat_growth_yoy": 2.7
+    }
+  },
+  "valuation": {
+    "market_cap": 1845000,
+    "pe_ratio": 22.8,
+    "dividend_per_share": 5.5,
+    "dividend_yield": 0.4
+  },
+  "business_performance": {
+    "oil_to_chemicals": {
+      "revenue": 164613,
+      "growth_yoy": 15.4
+    },
+    "retail": {
+      "revenue": 88637,
+      "growth_yoy": 15.6,
+      "jio_mart_growth": "2.4x QoQ"
+    },
+    "digital_services": {
+      "revenue": 40861,
+      "growth_yoy": 17.6,
+      "jio_subscribers": 488.2,
+      "arpu": 206.2
+    }
+  },
+  "strategic_initiatives": {
+    "green_energy": {
+      "investment": 10000,
+      "goal": "Net-zero by 2035",
+      "project": "Dhirubhai Ambani Green Energy Giga Complex",
+      "location": "Jamnagar, Gujarat",
+      "products": [
+        "Lithium-ion batteries",
+        "Solar panels",
+        "Powerwall",
+        "Megapack"
+      ],
+      "phases": [
+        "Phase 1: 2021–2024",
+        "Phase 2: 2024–2026"
+      ]
+    },
+    "media_merger": {
+      "partners": [
+        "Reliance",
+        "Disney India"
+      ],
+      "value": 70352,
+      "date": "2024-11-14"
+    }
+  },
+  "analyst_sentiment": {
+    "goldman_sachs": {
+      "rating": "Conviction Buy",
+      "catalysts": [
+        "EBITDA growth rebound",
+        "Improved refining fundamentals",
+        "Retail recovery",
+        "Potential telecom tariff hike"
+      ]
+    },
+    "jp_morgan": {
+      "rating": "Overweight",
+      "price_target": 1568,
+      "upside": 10.2
+    },
+    "jefferies": {
+      "outlook": "Positive",
+      "focus": "Consumer business growth"
+    }
+  },
+  "risks": {
+    "succession": {
+      "concern": "Leadership transition to next generation",
+      "status": "Ongoing"
+    },
+    "execution": {
+      "concern": "Green energy project timelines",
+      "status": "Under development"
+    },
+    "ipo": {
+      "concern": "Pending IPOs for Jio and Reliance Retail",
+      "status": "Uncertain"
+    }
+  }
+}
+
+
