@@ -98,6 +98,7 @@ class State(TypedDict):
     news: Optional[List[str]]
     stock_bucket: Optional[List[Dict[str, Dict[str, str]]]]
     stock_recommendations: Optional[List[Dict[str, Dict[str, str]]]]
+    stock_fundamentals: Optional[Dict[str, str]]
 
 #TODO: remeber to add maybe a starting node that sets a system promt and make the ai a good stock ai assistant etc.
 
@@ -200,6 +201,57 @@ def check_for_similar_past_instances(state: State) -> State:
     )
     return state
 
+def stock_fundamental_analysis(state: State) -> State:
+    """
+    Perform fundamental analysis on the stocks recommended.
+    """
+
+    #  prompt_to_get_summarised_from_json_fundamentals = ("""You are a professional financial analyst assistant. You will receive a JSON containing detailed fundamental analysis data for a publicly traded company. Your task is to generate a high-quality, concise summary (maximum 4 lines) that captures the most critical insights from the data.
+# Your summary must:
+# Highlight overall financial strength using key metrics like revenue, profit, growth rates, and valuation multiples (P/E, market cap).
+# Emphasize the performance of major business segments with numbers (e.g., retail, digital, O2C) and relevant user/customer metrics.
+# Mention strategic initiatives or investments (e.g., mergers, energy, IPOs), especially those with long-term impact.
+# Call out any important risks or uncertainties (e.g., leadership succession, execution delays, IPO timeline).
+# Include analyst sentiment and expected upside/downside if available.
+# Use precise numbers from the JSON (e.g., revenue of ₹9.98 lakh crore, ARPU ₹206.2, Jio users 488M, etc.) and synthesize the insights naturally as a human would in a financial executive briefing.
+# Output only the final summary in clear, well-structured prose. Do not include bullet points, analysis steps, or raw data. Keep it within 4 lines, highly informative, and suitable for downstream use in stock prediction pipelines.""")
+
+
+    # Initialize stock_fundamentals if it doesn't exist
+    if state.get("stock_fundamentals") is None:
+        state["stock_fundamentals"] = {}
+    
+    # Get the base path for fundamentals directory
+    fundamentals_base_path = os.path.join(os.path.dirname(__file__), '../resources/fundamentals')
+    
+    # Process each stock recommendation
+    for stock_rec in state["stock_recommendations"].stock_recommendations:
+        symbol = stock_rec.symbol
+        print(f"Processing fundamentals for stock: {symbol}")
+        symbol = "RELIANCE" #TODO: this is kept for testing purposes, remove later.
+        
+        # Construct the path to the fundamentals file
+        fundamentals_file_path = os.path.join(fundamentals_base_path, f"{symbol}.fundamentals.json")
+        
+        try:
+            # Check if file exists and read it
+            if os.path.exists(fundamentals_file_path):
+                with open(fundamentals_file_path, 'r') as f:
+                    fundamentals_data = json.load(f)
+                    
+                # Extract summary and add to state
+                summary = fundamentals_data.get("summary", "No summary available")
+                state["stock_fundamentals"][symbol] = summary
+            else:
+                print(f"Warning: Fundamentals file not found for {symbol}")
+                state["stock_fundamentals"][symbol] = "Fundamentals data not available"
+                
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Error reading fundamentals for {symbol}: {e}")
+            state["stock_fundamentals"][symbol] = "Error loading fundamentals data"
+    print("Final stock fundamentals:", state["stock_fundamentals"])
+    return state
+
 graph_builder = StateGraph(State)
 
 graph_builder.add_node(
@@ -220,6 +272,11 @@ graph_builder.add_node(
 graph_builder.add_node(
     "check_for_similar_past_instances",
     check_for_similar_past_instances,
+)
+
+graph_builder.add_node(
+    "stock_fundamental_analysis",
+    stock_fundamental_analysis,
 )
 
 graph_builder.add_edge(
@@ -244,6 +301,11 @@ graph_builder.add_edge(
 
 graph_builder.add_edge(
     "check_for_similar_past_instances",
+    "stock_fundamental_analysis",
+)
+
+graph_builder.add_edge(
+    "stock_fundamental_analysis",
     END,
 )
 
