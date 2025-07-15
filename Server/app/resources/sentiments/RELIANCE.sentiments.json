@@ -1,0 +1,117 @@
+{
+  "stock": "Reliance Industries Ltd",
+  "ticker": "RELIANCE",
+  "market": "India (NSE/BSE)",
+  "sentiment_analysis": {
+    "overall_sentiment": "Neutral",
+    "sentiment_score": 0.2,
+    "confidence": 0.85,
+    "breakdown": {
+      "positive_factors": [
+        {
+          "factor": "Strong market performance",
+          "description": "Reliance Industries stock has risen 24% in 2025, outperforming the Nifty's 7% gain, driven by robust prospects in new energy, retail, and telecom sectors.",
+          "source": "livemint.com, economictimes.indiatimes.com",
+          "impact": "High",
+          "reference": ["web:10", "web:24"]
+        },
+        {
+          "factor": "Bullish analyst outlook",
+          "description": "Analysts from Nuvama, CLSA, and Bernstein are optimistic, with target prices ranging from ₹1,640 to ₹1,801, citing growth in new energy, AI, and telecom.",
+          "source": "livemint.com, economictimes.indiatimes.com, business-standard.com",
+          "impact": "High",
+          "reference": ["web:1", "web:19", "web:24"]
+        },
+        {
+          "factor": "Q1FY26 earnings expectations",
+          "description": "Analysts anticipate double-digit EBITDA growth for Q1FY26, driven by strong performance in oil-to-chemicals, digital, and retail segments, with results due on July 18, 2025.",
+          "source": "india.com, livemint.com",
+          "impact": "Moderate",
+          "reference": ["web:13", "web:15"]
+        },
+        {
+          "factor": "Technical indicators",
+          "description": "The stock trades above its 20-day, 50-day, 100-day, and 200-day moving averages, indicating a positive trend despite recent declines.",
+          "source": "marketsmojo.com, CapitalTrends on X",
+          "impact": "Moderate",
+          "reference": ["web:2", "post:6", "post:7"]
+        },
+        {
+          "factor": "Reliance Jio subscriber growth",
+          "description": "Reliance Jio added 2.7 million subscribers in May 2025, with a 40.92% market share and rising ARPU, positioning it as a global leader in Fixed Wireless Access.",
+          "source": "upstox.com",
+          "impact": "Moderate",
+          "reference": ["web:3"]
+        }
+      ],
+      "negative_factors": [
+        {
+          "factor": "Recent stock price decline",
+          "description": "The stock has experienced a 3.04% decline over the past five days and is below its 5-day moving average, reflecting short-term bearish sentiment.",
+          "source": "marketsmojo.com, angelone.in",
+          "impact": "Moderate",
+          "reference": ["web:2", "web:6"]
+        },
+        {
+          "factor": "Delayed Jio IPO",
+          "description": "Reliance Jio's IPO, valued at over $100 billion, has been postponed beyond 2025, leading to a 1.8% drop in RIL's stock price and investor unease.",
+          "source": "reuters.com, upstox.com",
+          "impact": "High",
+          "reference": ["web:3", "web:22"]
+        },
+        {
+          "factor": "Bearish technical signals",
+          "description": "Some X posts highlight bearish divergence and resistance at ₹1,600, with warnings of a potential 'landslide' post-earnings on July 18, 2025.",
+          "source": "NiftyStar, mohak_ailani on X",
+          "impact": "Low",
+          "reference": ["post:2", "post:5"]
+        },
+        {
+          "factor": "Market uncertainties",
+          "description": "Uncertainty around U.S. tariffs, particularly a proposed 10% tariff on BRICS nations, has contributed to cautious investor sentiment.",
+          "source": "reuters.com",
+          "impact": "Low",
+          "reference": ["web:23"]
+        },
+        {
+          "factor": "High P/E ratio",
+          "description": "Reliance's P/E ratio of 29.48 is above the industry average of 24.95, suggesting potential overvaluation.",
+          "source": "angelone.in",
+          "impact": "Moderate",
+          "reference": ["web:6"]
+        }
+      ],
+      "neutral_factors": [
+        {
+          "factor": "High trading activity",
+          "description": "Reliance saw significant trading volumes, with over 2.4 million shares exchanged on July 14, 2025, reflecting sustained investor interest despite price volatility.",
+          "source": "marketsmojo.com",
+          "impact": "Moderate",
+          "reference": ["web:2"]
+        },
+        {
+          "factor": "Corporate restructuring",
+          "description": "Plans to consolidate FMCG brands under New Reliance Consumer Products Ltd and potential retail/telecom IPOs are in progress, but their impact remains uncertain.",
+          "source": "timesofindia.indiatimes.com",
+          "impact": "Low",
+          "reference": ["web:21"]
+        }
+      ]
+    },
+    "market_context": {
+      "current_price": "₹1,490.00",
+      "52_week_high": "₹1,608.95",
+      "52_week_low": "₹1,114.85",
+      "market_cap": "₹20,21,480.21 crore",
+      "date": "2025-07-15"
+    },
+    "sentiment_summary": {
+      "positive_drivers": "Strong year-to-date performance, bullish analyst targets, expected robust Q1FY26 earnings, and Jio's subscriber growth contribute to optimism.",
+      "negative_drivers": "Recent price declines, delayed Jio IPO, bearish technical signals, and external uncertainties like U.S. tariffs weigh on sentiment.",
+      "neutral_drivers": "High trading activity and ongoing corporate restructuring maintain investor interest but lack immediate impact.",
+      "outlook": "The sentiment is neutral due to a balance of strong fundamentals and near-term challenges. The upcoming Q1FY26 results on July 18, 2025, could be a key catalyst."
+    }
+  },
+  "summary": "The sentiment is neutral due to a balance of strong fundamentals and near-term challenges. Positive drivers include strong year-to-date performance, bullish analyst targets, expected robust Q1FY26 earnings, and Jio's subscriber growth. Negative drivers include recent price declines, delayed Jio IPO, bearish technical signals, and external uncertainties like U.S. tariffs. Neutral drivers like high trading activity and ongoing corporate restructuring maintain investor interest but lack immediate impact. The upcoming Q1FY26 results on July 18, 2025, could be a key catalyst.",
+  "disclaimer": "This analysis is based on recent news and social media sentiment as of July 15, 2025, and is for informational purposes only. It should not be considered financial advice. Always conduct your own research before making investment decisions."
+}

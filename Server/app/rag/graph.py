@@ -100,6 +100,7 @@ class State(TypedDict):
     stock_recommendations: Optional[List[Dict[str, Dict[str, str]]]]
     stock_fundamentals: Optional[Dict[str, str]]
     stock_technicals: Optional[Dict[str, str]]
+    stock_sentiments: Optional[Dict[str, str]]
 
 #TODO: remeber to add maybe a starting node that sets a system promt and make the ai a good stock ai assistant etc.
 
@@ -302,6 +303,54 @@ def stock_technical_analysis(state: State) -> State:
     print("Final stock technicals:", state["stock_technicals"])
     return state
 
+def stock_sentiment_analysis(state: State) -> State:
+    """
+    Perform sentiment analysis on the stocks recommended.
+    """
+
+    #  prompt_to_get_summarised_from_json_sentiments = (""""Perform a sentiment analysis for the stock [STOCK_NAME] (ticker: 
+    # [TICKER]) listed on [MARKET, e.g., India (NSE/BSE) or US (NYSE/NASDAQ)] and provide the results in JSON format.
+    # Include a detailed breakdown of positive, negative, and neutral factors influencing the sentiment, along with sources,
+    # impact levels, and references (e.g., web articles, X posts). Ensure the JSON includes a 'sentiment_summary' section with a
+    # concise overview of the sentiment, including positive, negative, and neutral drivers, and the overall outlook.
+    # Then, extract the 'sentiment_summary' section and return it as a single string, summarizing the key drivers and outlook in
+    # a clear and concise manner."""")
+
+
+    # Initialize stock_fundamentals if it doesn't exist
+    if state.get("stock_sentiments") is None:
+        state["stock_sentiments"] = {}
+    
+    # Get the base path for fundamentals directory
+    sentiments_base_path = os.path.join(os.path.dirname(__file__), '../resources/sentiments')
+    
+    # Process each stock recommendation
+    for stock_rec in state["stock_recommendations"].stock_recommendations:
+        symbol = stock_rec.symbol
+        print(f"Processing sentiments for stock: {symbol}")
+        symbol = "RELIANCE" #TODO: this is kept for testing purposes, remove later.
+        
+        # Construct the path to the fundamentals file
+        sentiments_file_path = os.path.join(sentiments_base_path, f"{symbol}.sentiments.json")
+        
+        try:
+            # Check if file exists and read it
+            if os.path.exists(sentiments_file_path):
+                with open(sentiments_file_path, 'r') as f:
+                    sentiments_data = json.load(f)
+                    
+                # Extract summary and add to state
+                summary = sentiments_data.get("summary", "No summary available")
+                state["stock_sentiments"][symbol] = summary
+            else:
+                print(f"Warning: Sentiments file not found for {symbol}")
+                state["stock_sentiments"][symbol] = "Sentiments data not available"
+                
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Error reading sentiments for {symbol}: {e}")
+            state["stock_sentiments"][symbol] = "Error loading sentiments data"
+    print("Final stock sentiments:", state["stock_sentiments"])
+    return state
 
 graph_builder = StateGraph(State)
 
@@ -333,6 +382,11 @@ graph_builder.add_node(
 graph_builder.add_node(
     "stock_technical_analysis",
     stock_technical_analysis,
+)
+
+graph_builder.add_node(
+    "stock_sentiment_analysis",
+    stock_sentiment_analysis,
 )
 
 graph_builder.add_edge(
@@ -367,6 +421,11 @@ graph_builder.add_edge(
 
 graph_builder.add_edge(
     "stock_technical_analysis",
+    "stock_sentiment_analysis",
+)
+
+graph_builder.add_edge(
+    "stock_sentiment_analysis",
     END,
 )
 
