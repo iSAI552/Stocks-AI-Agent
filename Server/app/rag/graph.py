@@ -99,6 +99,7 @@ class State(TypedDict):
     stock_bucket: Optional[List[Dict[str, Dict[str, str]]]]
     stock_recommendations: Optional[List[Dict[str, Dict[str, str]]]]
     stock_fundamentals: Optional[Dict[str, str]]
+    stock_technicals: Optional[Dict[str, str]]
 
 #TODO: remeber to add maybe a starting node that sets a system promt and make the ai a good stock ai assistant etc.
 
@@ -252,6 +253,56 @@ def stock_fundamental_analysis(state: State) -> State:
     print("Final stock fundamentals:", state["stock_fundamentals"])
     return state
 
+def stock_technical_analysis(state: State) -> State:
+    """
+    Perform technical analysis on the stocks recommended.
+    """
+
+    # prompt_to_get_summarised_from_json_technicals = ("Given the following technical analysis in JSON format for a stock",
+    # "generate a concise summary (maximum 5 lines) with clear, actionable insights for use in an AI-based trading workflow."
+    # "The summary should include: current trend, key support and resistance levels, important technical indicators (like RSI, MACD)",
+    # "any identified chart patterns (such as channels, breakouts, etc.), and risk levels. Write the summary in a professional",
+    # "human-like tone—similar to what a market analyst or trader might use. Avoid technical jargon or filler; focus on clarity"
+    # "and precision to support decision-making.")
+
+
+
+    # Initialize stock_fundamentals if it doesn't exist
+    if state.get("stock_technicals") is None:
+        state["stock_technicals"] = {}
+    
+    # Get the base path for fundamentals directory
+    technicals_base_path = os.path.join(os.path.dirname(__file__), '../resources/technicals')
+    
+    # Process each stock recommendation
+    for stock_rec in state["stock_recommendations"].stock_recommendations:
+        symbol = stock_rec.symbol
+        print(f"Processing technical for stock: {symbol}")
+        symbol = "RELIANCE" #TODO: this is kept for testing purposes, remove later.
+        
+        # Construct the path to the fundamentals file
+        technicals_file_path = os.path.join(technicals_base_path, f"{symbol}.technicals.json")
+        
+        try:
+            # Check if file exists and read it
+            if os.path.exists(technicals_file_path):
+                with open(technicals_file_path, 'r') as f:
+                    technicals_data = json.load(f)
+                    
+                # Extract summary and add to state
+                summary = technicals_data.get("summary", "No summary available")
+                state["stock_technicals"][symbol] = summary
+            else:
+                print(f"Warning: Technicals file not found for {symbol}")
+                state["stock_technicals"][symbol] = "Technicals data not available"
+                
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Error reading fundamentals for {symbol}: {e}")
+            state["stock_technicals"][symbol] = "Error loading technicals data"
+    print("Final stock technicals:", state["stock_technicals"])
+    return state
+
+
 graph_builder = StateGraph(State)
 
 graph_builder.add_node(
@@ -277,6 +328,11 @@ graph_builder.add_node(
 graph_builder.add_node(
     "stock_fundamental_analysis",
     stock_fundamental_analysis,
+)
+
+graph_builder.add_node(
+    "stock_technical_analysis",
+    stock_technical_analysis,
 )
 
 graph_builder.add_edge(
@@ -306,6 +362,11 @@ graph_builder.add_edge(
 
 graph_builder.add_edge(
     "stock_fundamental_analysis",
+    "stock_technical_analysis",
+)
+
+graph_builder.add_edge(
+    "stock_technical_analysis",
     END,
 )
 

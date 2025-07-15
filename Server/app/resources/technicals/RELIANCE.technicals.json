@@ -1,0 +1,76 @@
+{
+  "ticker": "RELIANCE",
+  "timeframes": {
+    "1_week": {
+      "trend": "neutral to mildly bearish",
+      "price_range": "₹1,510–₹1,520",
+      "support": ["₹1,475–₹1,480"],
+      "resistance": ["₹1,508", "₹1,517"],
+      "indicators": {
+        "RSI": 50.4,
+        "ADX": 36.3,
+        "MACD": 20.7,
+        "MFI": 60.0
+      },
+      "comment": "Mixed momentum: ADX strong trend, MACD positive, RSI neutral"
+    },
+    "1_month": {
+      "trend": "sideways with slight bullish bias",
+      "moving_averages": {
+        "above": ["20‑day (~₹1,491)", "50‑day (~₹1,452)", "100‑day (~₹1,354)", "200‑day (~₹1,326)"],
+        "below": ["5‑day (~₹1,510)"]
+      },
+      "volume": "increasing delivery percentage (~12–34%) indicating accumulation",
+      "indicators": {
+        "RSI": 69.5,
+        "Stochastic_RSI": 0.87,
+        "CCI": 109.0,
+        "MFI": 86.0
+      }
+    },
+    "1_year": {
+      "long_term_ma": {
+        "MA_20": 1390,
+        "MA_50": 1445,
+        "MA_100": 1386,
+        "MA_200": 1379
+      },
+      "current_vs_ma": "Price (~₹1,519) is above all major MAs – bullish signal",
+      "oscillators": {
+        "RSI": 68.9,
+        "MACD_signal": "Sell signal despite positive histogram"
+      },
+      "pattern": "Possible ascending channel between ₹1,480 and ₹1,560"
+    },
+    "3_years": {
+      "returns_percent": 24.0,
+      "volatility": "High (Beta ~1.25–1.38)",
+      "long_term_indicators": {
+        "weekly_MACD": "bullish",
+        "monthly_Bollinger_Bands": "bullish breakout",
+        "RSI": "neutral"
+      },
+      "pattern": "Cup-and-handle breakout in Jan 2024 – continuation likely if support holds"
+    },
+    "5_years": {
+      "returns_percent": 116.0,
+      "support_trendline": "Valid since 2021; currently testing breakout zone",
+      "critical_support": "₹1,094 – very strong long-term support"
+    }
+  },
+  "key_levels": {
+    "buy": ["₹1,480", "₹1,450–₹1,460", "₹1,094"],
+    "sell": ["₹1,559–₹1,560", "₹1,574–₹1,596", "₹1,620–₹1,630"]
+  },
+  "targets": {
+    "short_term": "₹1,560",
+    "mid_term": "₹1,630",
+    "weekly_channel_upside": "₹1,574–₹1,596"
+  },
+  "caveats": [
+    "RSI is near overbought – watch for short-term pullbacks",
+    "MACD shows mixed signals depending on timeframe",
+    "If support at ₹1,480 breaks, next zone is ₹1,450–₹1,460; break below ₹1,094 would signal major trend reversal"
+  ],
+  "summmary": "Reliance is trading in a bullish zone above all major MAs, with short-term support at ₹1,480 and resistance at ₹1,560. Indicators (RSI ~69, MACD positive, ADX strong) show momentum but caution due to near overbought levels. A channel is forming between ₹1,480–₹1,560; breakout targets ₹1,574–₹1,596. Long-term support at ₹1,094 is critical; breach could trigger a trend reversal. Overall setup favors upside with minor pullback risks."
+}
