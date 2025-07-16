@@ -1,0 +1,83 @@
+{
+  "stock": "Reliance Industries Ltd. (RELIANCE)",
+  "current_date": "2025-07-16",
+  "mutual_fund_holdings": [
+    {
+      "fund_name": "Parag Parikh Flexi Cap Fund",
+      "holding_percentage": "5.8%",
+      "weightage_change": {
+        "change": "Increased",
+        "percentage_change": "+0.3%",
+        "last_revision_date": "2025-03-31",
+        "comment": "Increased stake in May 2024, reflecting confidence in Reliance's diversified portfolio."
+      },
+      "target_price": "Not explicitly stated",
+      "source": "The Economic Times, June 11, 2024"
+    },
+    {
+      "fund_name": "Motilal Oswal Large Cap Fund",
+      "holding_percentage": "Not specified in top holdings",
+      "weightage_change": {
+        "change": "Increased",
+        "percentage_change": "Not quantified",
+        "last_revision_date": "2025-01-31",
+        "comment": "Motilal Oswal raised bets on Reliance in October 2022, with continued bullish outlook."
+      },
+      "target_price": "₹1605",
+      "source": "Motilal Oswal Financial Services, January 27, 2025"
+    },
+    {
+      "fund_name": "Kotak Flexicap Fund",
+      "holding_percentage": "Not specified in top holdings",
+      "weightage_change": {
+        "change": "Stable",
+        "percentage_change": "Not quantified",
+        "last_revision_date": "2025-03-31",
+        "comment": "Kotak MF has maintained exposure to Reliance, with no significant changes reported recently."
+      },
+      "target_price": "Not explicitly stated",
+      "source": "Kotak Securities, June 13, 2025"
+    },
+    {
+      "fund_name": "SBI Equity Hybrid Fund",
+      "holding_percentage": "Not specified in top holdings",
+      "weightage_change": {
+        "change": "Increased",
+        "percentage_change": "Not quantified",
+        "last_revision_date": "2024-05-31",
+        "comment": "SBI MF increased stakes in Reliance for three consecutive months ending May 2024."
+      },
+      "target_price": "Not explicitly stated",
+      "source": "The Economic Times, May 14, 2024"
+    },
+    {
+      "fund_name": "ICICI Prudential Bluechip Fund",
+      "holding_percentage": "Not specified in top holdings",
+      "weightage_change": {
+        "change": "Stable",
+        "percentage_change": "Not quantified",
+        "last_revision_date": "2025-03-31",
+        "comment": "ICICI Prudential has maintained consistent exposure, with no major changes in 2025."
+      },
+      "target_price": "Not explicitly stated",
+      "source": "General market data"
+    }
+  ],
+  "general_market_data": {
+    "current_share_price": "₹1496.65",
+    "52_week_high": "₹1605.85",
+    "52_week_low": "₹1114.85",
+    "mutual_fund_holding_percentage": "9.21% (as of March 31, 2025)",
+    "average_target_price": "₹1580.63 (based on 35 analysts)",
+    "analyst_ratings": {
+      "buy": 34,
+      "hold": 1,
+      "sell": 3
+    },
+    "pe_ratio": "24.78 (TTM)",
+    "market_cap": "₹1770034.38 crore",
+    "dividend_yield": "1.24% (Q4 FY24-25)"
+  },
+  "summary": "Reliance Industries Ltd. (RELIANCE) has a 9.21% mutual fund holding as of March 31, 2025, with Parag Parikh Flexi Cap Fund holding 5.8% (+0.3% increase), while Motilal Oswal, Kotak Flexicap, SBI Equity Hybrid, and ICICI Prudential Bluechip funds show stable or increased exposure without specific percentages. The stock's current price is ₹1496.65, with a 52-week range of ₹1114.85–₹1605.85, a P/E ratio of 24.78, and a market cap of ₹17.7 lakh crore. Analysts (34 buy, 1 hold, 3 sell) set an average target price of ₹1580.63, with Motilal Oswal at ₹1605. Reliance underperformed Nifty 50 in 2024 but is poised for recovery driven by Jio, Retail, and O2C segments. Data is sourced from The Economic Times, Motilal Oswal, Kotak Securities, LiveMint, and INDMoney (May 2024–July 2025)."
+  
+}

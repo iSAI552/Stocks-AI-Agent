@@ -101,6 +101,7 @@ class State(TypedDict):
     stock_fundamentals: Optional[Dict[str, str]]
     stock_technicals: Optional[Dict[str, str]]
     stock_sentiments: Optional[Dict[str, str]]
+    stock_mutual_funds: Optional[Dict[str, str]]
 
 #TODO: remeber to add maybe a starting node that sets a system promt and make the ai a good stock ai assistant etc.
 
@@ -352,6 +353,57 @@ def stock_sentiment_analysis(state: State) -> State:
     print("Final stock sentiments:", state["stock_sentiments"])
     return state
 
+def stock_mutual_funds_weightage_analysis(state: State) -> State:
+    """
+    Perform mutual funds weightage analysis on the stocks recommended.
+    """
+    #  prompt_to_get_summarised_from_json_mf = ("""Create a concise summary (maximum 5 lines) of the provided
+    # JSON data for a specified stock, capturing all relevant details for an LLM to understand the stock's current 
+    # position in major Indian mutual funds (e.g., Parag Parikh Flexi Cap, Motilal Oswal, Kotak Flexicap, SBI Equity 
+    # Hybrid, ICICI Prudential Bluechip). Include the stock's mutual fund holding percentage, specific fund holdings 
+    # with weightage changes (e.g., increase/decrease with percentages or qualitative notes), current share price, 
+    # 52-week high/low, P/E ratio, market cap, average target price, analyst ratings (buy/hold/sell), and key growth 
+    # drivers. Highlight any underperformance or recovery potential and mention data sources with their dates. 
+    # Ensure the summary is dense with information, structured for clarity, and suitable for LLM processing.""")
+
+
+    # Initialize stock_fundamentals if it doesn't exist
+    if state.get("stock_mutual_funds") is None:
+        state["stock_mutual_funds"] = {}
+    
+    # Get the base path for fundamentals directory
+    mutual_funds_base_path = os.path.join(os.path.dirname(__file__), '../resources/mutualFundsData')
+    
+    # Process each stock recommendation
+    for stock_rec in state["stock_recommendations"].stock_recommendations:
+        symbol = stock_rec.symbol
+        print(f"Processing mfs for stock: {symbol}")
+        symbol = "RELIANCE" #TODO: this is kept for testing purposes, remove later.
+        
+        # Construct the path to the fundamentals file
+        mutual_funds_file_path = os.path.join(mutual_funds_base_path, f"{symbol}.mutualFund.json")
+        
+        try:
+            # Check if file exists and read it
+            if os.path.exists(mutual_funds_file_path):
+                with open(mutual_funds_file_path, 'r') as f:
+                    mf_data = json.load(f)
+                    
+                # Extract summary and add to state
+                summary = mf_data.get("summary", "No summary available")
+                state["stock_mutual_funds"][symbol] = summary
+            else:
+                print(f"Warning: mf file not found for {symbol}")
+                state["stock_mutual_funds"][symbol] = "MF data not available"
+                
+        except (json.JSONDecodeError, IOError) as e:
+            print(f"Error reading MF for {symbol}: {e}")
+            state["stock_mutual_funds"][symbol] = "Error loading MF data"
+    print("Final stock MF:", state["stock_mutual_funds"])
+    return state
+    
+    
+
 graph_builder = StateGraph(State)
 
 graph_builder.add_node(
@@ -387,6 +439,11 @@ graph_builder.add_node(
 graph_builder.add_node(
     "stock_sentiment_analysis",
     stock_sentiment_analysis,
+)
+
+graph_builder.add_node(
+    "stock_mutual_funds_weightage_analysis",
+    stock_mutual_funds_weightage_analysis,
 )
 
 graph_builder.add_edge(
@@ -426,6 +483,11 @@ graph_builder.add_edge(
 
 graph_builder.add_edge(
     "stock_sentiment_analysis",
+    "stock_mutual_funds_weightage_analysis",
+)
+
+graph_builder.add_edge(
+    "stock_mutual_funds_weightage_analysis",
     END,
 )
 
