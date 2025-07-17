@@ -8,12 +8,13 @@ from dotenv import load_dotenv
 import os
 from pydantic import BaseModel
 import json
+from datetime import datetime
 
 load_dotenv()
 
 OPENAI_MINI_MODEL = ""
 OPENAI_MAIN_MODEL = ""
-GEMINI_MINI_MODEL = "gemini-2.5-flash-preview-04-17"
+GEMINI_MINI_MODEL = "gemini-2.5-flash"
 GEMINI_MAIN_MODEL = "gemini-2.5-pro"
 
 ModelType = Literal["openai_mini", "openai_main", "gemini_mini", "gemini_main"]
@@ -89,6 +90,22 @@ class stockRecommendationResponse(BaseModel):
             }
         }
 
+class FinalPrediction(BaseModel):
+    symbol: str
+    action: str  # "BUY", "SELL", "HOLD"
+    price_target: str
+    stop_loss: str
+    confidence: str
+    time_horizon: str  # "short", "medium", "long"
+    risk_level: str  # "low", "medium", "high"
+    reason: str
+    key_factors: List[str]
+
+class finalPredictionResponse(BaseModel):
+    final_predictions: List[FinalPrediction]
+    market_outlook: str
+    overall_risk_assessment: str
+
 class State(TypedDict):
     """
     Represents a state in the graph.
@@ -103,7 +120,8 @@ class State(TypedDict):
     stock_technicals: Optional[Dict[str, str]]
     stock_sentiments: Optional[Dict[str, str]]
     stock_mutual_funds: Optional[Dict[str, str]]
-    existing_stock_holdings: Optional[Dict[Dict[str, str]]]
+    existing_stock_holdings: Optional[Dict[str, Dict[str, str]]]
+    final_predictions: Optional[Dict[str, Dict[str, str]]]
 
 #TODO: remeber to add maybe a starting node that sets a system promt and make the ai a good stock ai assistant etc.
 
@@ -404,14 +422,14 @@ def stock_mutual_funds_weightage_analysis(state: State) -> State:
     print("Final stock MF:", state["stock_mutual_funds"])
     return state
     
-def check_holdings_access(state: State) -> Literal["analyse_mystock_holdings", "__end__"]:
+def check_holdings_access(state: State) -> Literal["analyse_mystock_holdings", "combined_prediction"]:
     """
     Conditional function to determine next node based on access_to_holdings flag.
     """
     if state.get("access_to_holdings", False):
         return "analyse_mystock_holdings"
     else:
-        return "__end__"
+        return "combined_prediction"
 
 def analyse_mystock_holdings(state: State) -> State:
     """
@@ -480,6 +498,115 @@ def analyse_mystock_holdings(state: State) -> State:
 
     return state
 
+def combined_prediction(state: State) -> State:
+    """
+    Combine all analyses and generate final stock predictions.
+    """
+    # Initialize final_predictions if it doesn't exist
+    if state.get("final_predictions") is None:
+        state["final_predictions"] = {}
+    
+    # Prepare comprehensive prompt with all available analysis data
+    prompt_combined_analysis = f"""
+You are a world-class stock market analyst and investment advisor with expertise in Indian and US markets. 
+You have been provided with comprehensive analysis data for multiple stocks. Your task is to generate final actionable investment predictions for today ({datetime.now().strftime('%Y-%m-%d')}).
+
+ANALYSIS DATA PROVIDED:
+======================
+
+NEWS ANALYSIS:
+{state.get('news', 'No news data available')}
+
+INITIAL STOCK RECOMMENDATIONS:
+{state.get('stock_recommendations', 'No recommendations available')}
+
+FUNDAMENTAL ANALYSIS:
+{state.get('stock_fundamentals', 'No fundamental data available')}
+
+TECHNICAL ANALYSIS:
+{state.get('stock_technicals', 'No technical data available')}
+
+SENTIMENT ANALYSIS:
+{state.get('stock_sentiments', 'No sentiment data available')}
+
+MUTUAL FUNDS ANALYSIS:
+{state.get('stock_mutual_funds', 'No mutual funds data available')}
+
+USER STOCK HOLDINGS (if available):
+{state.get('existing_stock_holdings', 'No user holdings data available')}
+
+INSTRUCTIONS:
+============
+
+Based on ALL the analysis data above, provide comprehensive final investment predictions. For each stock:
+
+1. Analyze and synthesize ALL available data (news, fundamentals, technicals, sentiment, mutual funds, user holdings)
+2. Provide a clear ACTION: BUY, SELL, or HOLD
+3. Set realistic PRICE TARGETS and STOP LOSS levels
+4. Assess CONFIDENCE level (0-100%)
+5. Determine appropriate TIME HORIZON (short/medium/long term)
+6. Evaluate RISK LEVEL (low/medium/high)
+7. Provide detailed REASONING incorporating all analysis factors
+8. List KEY FACTORS that influenced your decision
+
+ADDITIONAL REQUIREMENTS:
+- Consider current market conditions and broader economic factors
+- If user holdings data is available, provide personalized advice (whether to add, reduce, or maintain positions)
+- Factor in risk management and portfolio diversification
+- Be realistic about price targets and timeframes
+- Highlight any conflicting signals between different analysis types
+
+MARKET OUTLOOK:
+Provide an overall market outlook for the next 1-3 months based on the news and analysis.
+
+RISK ASSESSMENT:
+Provide an overall risk assessment for the current market environment.
+
+Return your analysis in the specified JSON format with final_predictions, market_outlook, and overall_risk_assessment.
+"""
+
+    try:
+        # Make LLM call to get final predictions
+        final_response = llm_call(
+            prompt_combined_analysis,
+            "gemini_main",  # Using main model for critical final analysis
+            finalPredictionResponse
+        )
+        
+        # Store the final predictions in state
+        if hasattr(final_response, 'final_predictions'):
+            # Convert to dictionary format for easier access
+            final_preds_dict = {}
+            for pred in final_response.final_predictions:
+                final_preds_dict[pred.symbol] = {
+                    "action": pred.action,
+                    "price_target": pred.price_target,
+                    "stop_loss": pred.stop_loss,
+                    "confidence": pred.confidence,
+                    "time_horizon": pred.time_horizon,
+                    "risk_level": pred.risk_level,
+                    "reason": pred.reason,
+                    "key_factors": pred.key_factors
+                }
+            
+            state["final_predictions"] = final_preds_dict
+            
+            # Store market outlook and risk assessment
+            state["market_outlook"] = getattr(final_response, 'market_outlook', 'No market outlook provided')
+            state["overall_risk_assessment"] = getattr(final_response, 'overall_risk_assessment', 'No risk assessment provided')
+        
+        print("Final predictions generated successfully")
+        print(f"Market Outlook: {state.get('market_outlook', 'N/A')}")
+        print(f"Risk Assessment: {state.get('overall_risk_assessment', 'N/A')}")
+        
+    except Exception as e:
+        print(f"Error generating final predictions: {e}")
+        state["final_predictions"] = {"error": "Failed to generate final predictions"}
+        state["market_outlook"] = "Unable to assess market outlook due to error"
+        state["overall_risk_assessment"] = "Unable to assess risk due to error"
+    
+    return state
+
 graph_builder = StateGraph(State)
 
 graph_builder.add_node(
@@ -527,6 +654,11 @@ graph_builder.add_node(
     analyse_mystock_holdings,
 )
 
+graph_builder.add_node(
+    "combined_prediction",
+    combined_prediction,
+)
+
 graph_builder.add_edge(
     START,
     "get_overall_market_relevant_news",
@@ -572,19 +704,24 @@ graph_builder.add_conditional_edges(
     check_holdings_access,
     {
         "analyse_mystock_holdings": "analyse_mystock_holdings",
-        "__end__": END
+        "combined_prediction": "combined_prediction"
     }
 )
 
 graph_builder.add_edge(
     "analyse_mystock_holdings",
+    "combined_prediction",
+)
+
+graph_builder.add_edge(
+    "combined_prediction",
     END,
 )
 
 graph = graph_builder.compile()
 
 # Use the graph
-def call_graph() -> str:
+def call_graph() -> Dict:
     """
     Calls the graph with the user message and returns the AI response.
     """
@@ -595,12 +732,37 @@ def call_graph() -> str:
     }
     
     result: State = graph.invoke(state)
-    return result.get("stock_recommendations", "No AI response generated.")
+    
+    # Return comprehensive results
+    return {
+        "final_predictions": result.get("final_predictions", {}),
+        "market_outlook": result.get("market_outlook", "No market outlook available"),
+        "overall_risk_assessment": result.get("overall_risk_assessment", "No risk assessment available"),
+        "initial_stock_recommendations": result.get("stock_recommendations", []),
+        "news": result.get("news", [])
+    }
 
 if __name__ == "__main__":
     print("Welcome to the Stock Market AI Assistant!")
     try:
         response = call_graph()
-        print(f"news Response: {response}")
+        print(f"\n=== FINAL STOCK PREDICTIONS ===")
+        for symbol, pred in response["final_predictions"].items():
+            print(f"\nStock: {symbol}")
+            print(f"Action: {pred['action']}")
+            print(f"Price Target: {pred['price_target']}")
+            print(f"Stop Loss: {pred['stop_loss']}")
+            print(f"Confidence: {pred['confidence']}")
+            print(f"Time Horizon: {pred['time_horizon']}")
+            print(f"Risk Level: {pred['risk_level']}")
+            print(f"Reason: {pred['reason']}")
+            print(f"Key Factors: {', '.join(pred['key_factors'])}")
+        
+        print(f"\n=== MARKET OUTLOOK ===")
+        print(response["market_outlook"])
+        
+        print(f"\n=== OVERALL RISK ASSESSMENT ===")
+        print(response["overall_risk_assessment"])
+        
     except Exception as e:
         print(f"Error found: {e}")
