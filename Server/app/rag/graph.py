@@ -508,62 +508,62 @@ def combined_prediction(state: State) -> State:
     
     # Prepare comprehensive prompt with all available analysis data
     prompt_combined_analysis = f"""
-You are a world-class stock market analyst and investment advisor with expertise in Indian and US markets. 
-You have been provided with comprehensive analysis data for multiple stocks. Your task is to generate final actionable investment predictions for today ({datetime.now().strftime('%Y-%m-%d')}).
+    You are a world-class stock market analyst and investment advisor with expertise in Indian and US markets. 
+    You have been provided with comprehensive analysis data for multiple stocks. Your task is to generate final actionable investment predictions for today ({datetime.now().strftime('%Y-%m-%d')}).
 
-ANALYSIS DATA PROVIDED:
-======================
+    ANALYSIS DATA PROVIDED:
+    ======================
 
-NEWS ANALYSIS:
-{state.get('news', 'No news data available')}
+    NEWS ANALYSIS:
+    {state.get('news', 'No news data available')}
 
-INITIAL STOCK RECOMMENDATIONS:
-{state.get('stock_recommendations', 'No recommendations available')}
+    INITIAL STOCK RECOMMENDATIONS:
+    {state.get('stock_recommendations', 'No recommendations available')}
 
-FUNDAMENTAL ANALYSIS:
-{state.get('stock_fundamentals', 'No fundamental data available')}
+    FUNDAMENTAL ANALYSIS:
+    {state.get('stock_fundamentals', 'No fundamental data available')}
 
-TECHNICAL ANALYSIS:
-{state.get('stock_technicals', 'No technical data available')}
+    TECHNICAL ANALYSIS:
+    {state.get('stock_technicals', 'No technical data available')}
 
-SENTIMENT ANALYSIS:
-{state.get('stock_sentiments', 'No sentiment data available')}
+    SENTIMENT ANALYSIS:
+    {state.get('stock_sentiments', 'No sentiment data available')}
 
-MUTUAL FUNDS ANALYSIS:
-{state.get('stock_mutual_funds', 'No mutual funds data available')}
+    MUTUAL FUNDS ANALYSIS:
+    {state.get('stock_mutual_funds', 'No mutual funds data available')}
 
-USER STOCK HOLDINGS (if available):
-{state.get('existing_stock_holdings', 'No user holdings data available')}
+    USER STOCK HOLDINGS (if available):
+    {state.get('existing_stock_holdings', 'No user holdings data available')}
 
-INSTRUCTIONS:
-============
+    INSTRUCTIONS:
+    ============
 
-Based on ALL the analysis data above, provide comprehensive final investment predictions. For each stock:
+    Based on ALL the analysis data above, provide comprehensive final investment predictions. For each stock:
 
-1. Analyze and synthesize ALL available data (news, fundamentals, technicals, sentiment, mutual funds, user holdings)
-2. Provide a clear ACTION: BUY, SELL, or HOLD
-3. Set realistic PRICE TARGETS and STOP LOSS levels
-4. Assess CONFIDENCE level (0-100%)
-5. Determine appropriate TIME HORIZON (short/medium/long term)
-6. Evaluate RISK LEVEL (low/medium/high)
-7. Provide detailed REASONING incorporating all analysis factors
-8. List KEY FACTORS that influenced your decision
+    1. Analyze and synthesize ALL available data (news, fundamentals, technicals, sentiment, mutual funds, user holdings)
+    2. Provide a clear ACTION: BUY, SELL, or HOLD
+    3. Set realistic PRICE TARGETS and STOP LOSS levels
+    4. Assess CONFIDENCE level (0-100%)
+    5. Determine appropriate TIME HORIZON (short/medium/long term)
+    6. Evaluate RISK LEVEL (low/medium/high)
+    7. Provide detailed REASONING incorporating all analysis factors
+    8. List KEY FACTORS that influenced your decision
 
-ADDITIONAL REQUIREMENTS:
-- Consider current market conditions and broader economic factors
-- If user holdings data is available, provide personalized advice (whether to add, reduce, or maintain positions)
-- Factor in risk management and portfolio diversification
-- Be realistic about price targets and timeframes
-- Highlight any conflicting signals between different analysis types
+    ADDITIONAL REQUIREMENTS:
+    - Consider current market conditions and broader economic factors
+    - If user holdings data is available, provide personalized advice (whether to add, reduce, or maintain positions)
+    - Factor in risk management and portfolio diversification
+    - Be realistic about price targets and timeframes
+    - Highlight any conflicting signals between different analysis types
 
-MARKET OUTLOOK:
-Provide an overall market outlook for the next 1-3 months based on the news and analysis.
+    MARKET OUTLOOK:
+    Provide an overall market outlook for the next 1-3 months based on the news and analysis.
 
-RISK ASSESSMENT:
-Provide an overall risk assessment for the current market environment.
+    RISK ASSESSMENT:
+    Provide an overall risk assessment for the current market environment.
 
-Return your analysis in the specified JSON format with final_predictions, market_outlook, and overall_risk_assessment.
-"""
+    Return your analysis in the specified JSON format with final_predictions, market_outlook, and overall_risk_assessment.
+    """
 
     try:
         # Make LLM call to get final predictions
