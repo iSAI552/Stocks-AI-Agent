@@ -95,6 +95,7 @@ class State(TypedDict):
     """
     user_msg: str
     ai_msg: str
+    access_to_holdings: bool
     news: Optional[List[str]]
     stock_bucket: Optional[List[Dict[str, Dict[str, str]]]]
     stock_recommendations: Optional[List[Dict[str, Dict[str, str]]]]
@@ -102,6 +103,7 @@ class State(TypedDict):
     stock_technicals: Optional[Dict[str, str]]
     stock_sentiments: Optional[Dict[str, str]]
     stock_mutual_funds: Optional[Dict[str, str]]
+    existing_stock_holdings: Optional[Dict[Dict[str, str]]]
 
 #TODO: remeber to add maybe a starting node that sets a system promt and make the ai a good stock ai assistant etc.
 
@@ -402,7 +404,81 @@ def stock_mutual_funds_weightage_analysis(state: State) -> State:
     print("Final stock MF:", state["stock_mutual_funds"])
     return state
     
+def check_holdings_access(state: State) -> Literal["analyse_mystock_holdings", "__end__"]:
+    """
+    Conditional function to determine next node based on access_to_holdings flag.
+    """
+    if state.get("access_to_holdings", False):
+        return "analyse_mystock_holdings"
+    else:
+        return "__end__"
+
+def analyse_mystock_holdings(state: State) -> State:
+    """
+    Perform analysis on the user's stock holdings.
+    Optional Node.
+    """
+    # make the database call here or get the data from user input 
+
+    user_stock_holdings = [
+        {
+            "symbol": "RELIANCE",
+            "quantity": "50",
+            "averageBuyPrice": "2800",
+            "purchaseDates": ["2024-01-15"],
+            "targetPrice": "3200",
+            "stopLossPrice": "2700",
+            "portfolioAllocation": "25",
+            "investmentHorizon": "long",
+            "dividendPreference": "True",
+            "sector": "Energy",
+            "riskTolerance": "medium"
+        },
+        {
+            "symbol": "TCS",
+            "quantity": "20",
+            "averageBuyPrice": "3500",
+            "purchaseDates": ["2024-03-10"],
+            "targetPrice": "4000",
+            "stopLossPrice": "3400",
+            "portfolioAllocation": "15",
+            "investmentHorizon": "medium",
+            "dividendPreference": "False",
+            "sector": "IT",
+            "riskTolerance": "low"
+        }
+    ]
+
+    # Initialize existing_stock_holdings if it doesn't exist
+    if state.get("existing_stock_holdings") is None:
+        state["existing_stock_holdings"] = {}
+
+    # Process each stock recommendation
+    for stock_rec in state["stock_recommendations"].stock_recommendations:
+        symbol = stock_rec.symbol
+        print(f"Processing holdings for stock: {symbol}")
+        symbol = "RELIANCE"
+        # Check if the stock is in the user's holdings
+        for holding in user_stock_holdings:
+            if holding["symbol"] == symbol:
+                # Add the holding details to the state
+                state["existing_stock_holdings"][symbol] = {
+                    "quantity": holding["quantity"],
+                    "averageBuyPrice": holding["averageBuyPrice"],
+                    "purchaseDates": holding["purchaseDates"],
+                    "targetPrice": holding["targetPrice"],
+                    "stopLossPrice": holding["stopLossPrice"],
+                    "portfolioAllocation": holding["portfolioAllocation"],
+                    "investmentHorizon": holding["investmentHorizon"],
+                    "dividendPreference": holding["dividendPreference"],
+                    "sector": holding["sector"],
+                    "riskTolerance": holding["riskTolerance"]
+                }
+                break
     
+    print("Final existing stock holdings:", state["existing_stock_holdings"])           
+
+    return state
 
 graph_builder = StateGraph(State)
 
@@ -446,6 +522,11 @@ graph_builder.add_node(
     stock_mutual_funds_weightage_analysis,
 )
 
+graph_builder.add_node(
+    "analyse_mystock_holdings",
+    analyse_mystock_holdings,
+)
+
 graph_builder.add_edge(
     START,
     "get_overall_market_relevant_news",
@@ -486,8 +567,17 @@ graph_builder.add_edge(
     "stock_mutual_funds_weightage_analysis",
 )
 
-graph_builder.add_edge(
+graph_builder.add_conditional_edges(
     "stock_mutual_funds_weightage_analysis",
+    check_holdings_access,
+    {
+        "analyse_mystock_holdings": "analyse_mystock_holdings",
+        "__end__": END
+    }
+)
+
+graph_builder.add_edge(
+    "analyse_mystock_holdings",
     END,
 )
 
@@ -501,6 +591,7 @@ def call_graph() -> str:
     state = {
         "user_msg": "",
         "ai_msg": "",
+        "access_to_holdings": True,  # Assuming we have access to user's holdings
     }
     
     result: State = graph.invoke(state)
