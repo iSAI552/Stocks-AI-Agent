@@ -713,6 +713,22 @@ def send_notification(state: State) -> State:
     
     return state
 
+def self_improve(state: State) -> State:
+    """
+    Self-improvement function to enhance the AI's performance.
+    This is a placeholder for future self-improvement logic.
+    """
+    # Implement self-improvement logic here
+    print("Self-improvement function called - no implementation yet")
+
+    # This is an future work optional Node
+    # This basically will check at the end of the market session whether something actually happened as predicted or not.
+    # Then make a memory database of it how and what happened actually.
+    # Also can include auto promt engineering to improve the prompts used in the analysis.
+    # Later point this can be used to change the stock bucket list of 30 we have.
+    
+    return state
+
 graph_builder = StateGraph(State)
 
 graph_builder.add_node(
@@ -773,6 +789,11 @@ graph_builder.add_node(
 graph_builder.add_node(
     "send_notification",
     send_notification,
+)
+
+graph_builder.add_node(
+    "self_improve",
+    self_improve,
 )
 
 graph_builder.add_edge(
@@ -841,6 +862,11 @@ graph_builder.add_edge(
 
 graph_builder.add_edge(
     "send_notification",
+    "self_improve",
+)
+
+graph_builder.add_edge(
+    "self_improve",
     END,
 )
 
