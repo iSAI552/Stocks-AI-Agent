@@ -607,6 +607,21 @@ def combined_prediction(state: State) -> State:
     
     return state
 
+def update_final_values_in_db(state: State) -> State:
+    """
+    Update the final predictions and analysis in the database.
+    This is a placeholder function for actual database update logic.
+    """
+    # Here you would implement the logic to update the database with final predictions
+    # For now, we will just print the final predictions
+    print("Updating final predictions in database...")
+    
+    # Example of how you might structure the update
+    for symbol, prediction in state["final_predictions"].items():
+        print(f"Updating {symbol}: {prediction}")
+    
+    return state
+
 graph_builder = StateGraph(State)
 
 graph_builder.add_node(
@@ -657,6 +672,11 @@ graph_builder.add_node(
 graph_builder.add_node(
     "combined_prediction",
     combined_prediction,
+)
+
+graph_builder.add_node(
+    "update_final_values_in_db",
+    update_final_values_in_db,
 )
 
 graph_builder.add_edge(
@@ -715,6 +735,11 @@ graph_builder.add_edge(
 
 graph_builder.add_edge(
     "combined_prediction",
+    "update_final_values_in_db",
+)
+
+graph_builder.add_edge(
+    "update_final_values_in_db",
     END,
 )
 
