@@ -10,4 +10,6 @@ dependencies = [
     "langsmith>=0.4.4",
     "openai>=1.93.0",
     "pydantic>=2.11.7",
+    "python-telegram-bot>=22.2",
+    "requests>=2.32.4",
 ]

@@ -6,9 +6,20 @@ from langsmith import traceable
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+import sys
 from pydantic import BaseModel
 import json
 from datetime import datetime
+
+# Add the Server directory to Python path to enable absolute imports
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
+
+try:
+    from app.utils.telegram import send_predictions_to_telegram, send_alert_to_telegram
+except ImportError:
+    # Fallback for when running as script directly
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+    from app.utils.telegram import send_predictions_to_telegram, send_alert_to_telegram
 
 load_dotenv()
 
@@ -122,6 +133,10 @@ class State(TypedDict):
     stock_mutual_funds: Optional[Dict[str, str]]
     existing_stock_holdings: Optional[Dict[str, Dict[str, str]]]
     final_predictions: Optional[Dict[str, Dict[str, str]]]
+    market_outlook: Optional[str]
+    overall_risk_assessment: Optional[str]
+    user_telegram_id: Optional[str]
+    user_name: Optional[str]
 
 #TODO: remeber to add maybe a starting node that sets a system promt and make the ai a good stock ai assistant etc.
 
@@ -622,6 +637,82 @@ def update_final_values_in_db(state: State) -> State:
     
     return state
 
+def send_notification(state: State) -> State:
+    """
+    Send final predictions to user via Telegram.
+    """
+    try:
+        # Get user information from state
+        user_telegram_id = state.get("user_telegram_id")
+        user_name = state.get("user_name", "User")
+        
+        # Check if we have the required telegram ID
+        if not user_telegram_id:
+            print("❌ No Telegram ID provided - cannot send notification")
+            send_alert_to_telegram(
+                chat_id=os.getenv("ADMIN_TELEGRAM_ID", ""),  # Fallback to admin
+                title="Notification Error",
+                message="User Telegram ID not found - predictions generated but not sent",
+                alert_type="WARNING"
+            )
+            return state
+        
+        # Prepare prediction data for Telegram
+        predictions_data = {
+            "final_predictions": state.get("final_predictions", {}),
+            "market_outlook": state.get("market_outlook", "No market outlook available"),
+            "overall_risk_assessment": state.get("overall_risk_assessment", "No risk assessment available"),
+            "initial_stock_recommendations": state.get("stock_recommendations", []),
+            "news": state.get("news", [])
+        }
+        
+        # Send predictions to user via Telegram
+        success = send_predictions_to_telegram(
+            chat_id=user_telegram_id,
+            predictions_data=predictions_data,
+            user_name=user_name
+        )
+        
+        if success:
+            print(f"✅ Successfully sent predictions to {user_name} ({user_telegram_id})")
+            
+            # Log successful notification for admin (optional)
+            admin_id = os.getenv("ADMIN_TELEGRAM_ID")
+            if admin_id and admin_id != user_telegram_id:
+                send_alert_to_telegram(
+                    chat_id=admin_id,
+                    title="Notification Sent",
+                    message=f"Stock predictions successfully sent to {user_name} ({user_telegram_id})",
+                    alert_type="SUCCESS"
+                )
+        else:
+            print(f"❌ Failed to send predictions to {user_name} ({user_telegram_id})")
+            
+            # Send error notification to admin
+            admin_id = os.getenv("ADMIN_TELEGRAM_ID")
+            if admin_id:
+                send_alert_to_telegram(
+                    chat_id=admin_id,
+                    title="Notification Failed",
+                    message=f"Failed to send stock predictions to {user_name} ({user_telegram_id}). Please check logs for details.",
+                    alert_type="ERROR"
+                )
+    
+    except Exception as e:
+        print(f"❌ Error in send_notification: {e}")
+        
+        # Send error to admin if available
+        admin_id = os.getenv("ADMIN_TELEGRAM_ID")
+        if admin_id:
+            send_alert_to_telegram(
+                chat_id=admin_id,
+                title="Critical Notification Error",
+                message=f"Exception in send_notification function: {str(e)}",
+                alert_type="ERROR"
+            )
+    
+    return state
+
 graph_builder = StateGraph(State)
 
 graph_builder.add_node(
@@ -677,6 +768,11 @@ graph_builder.add_node(
 graph_builder.add_node(
     "update_final_values_in_db",
     update_final_values_in_db,
+)
+
+graph_builder.add_node(
+    "send_notification",
+    send_notification,
 )
 
 graph_builder.add_edge(
@@ -740,20 +836,31 @@ graph_builder.add_edge(
 
 graph_builder.add_edge(
     "update_final_values_in_db",
+    "send_notification",
+)
+
+graph_builder.add_edge(
+    "send_notification",
     END,
 )
 
 graph = graph_builder.compile()
 
 # Use the graph
-def call_graph() -> Dict:
+def call_graph(user_telegram_id: Optional[str] = None, user_name: Optional[str] = None) -> Dict:
     """
     Calls the graph with the user message and returns the AI response.
+    
+    Args:
+        user_telegram_id: The Telegram chat ID to send notifications to
+        user_name: The user's name for personalized messages
     """
     state = {
         "user_msg": "",
         "ai_msg": "",
         "access_to_holdings": True,  # Assuming we have access to user's holdings
+        "user_telegram_id": user_telegram_id,
+        "user_name": user_name or "User",
     }
     
     result: State = graph.invoke(state)
@@ -770,7 +877,19 @@ def call_graph() -> Dict:
 if __name__ == "__main__":
     print("Welcome to the Stock Market AI Assistant!")
     try:
-        response = call_graph()
+        user_telegram_id = os.getenv("USER_TELEGRAM_ID")  # Set this in your .env file
+        user_name = os.getenv("USER_NAME", "User")
+        
+        print(f"Running analysis for user: {user_name}")
+        if user_telegram_id:
+            print(f"Notifications will be sent to Telegram ID: {user_telegram_id}")
+        else:
+            print("No Telegram ID provided - predictions will only be displayed in console")
+        
+        response = call_graph(
+            user_telegram_id=user_telegram_id,
+            user_name=user_name
+        )
         print(f"\n=== FINAL STOCK PREDICTIONS ===")
         for symbol, pred in response["final_predictions"].items():
             print(f"\nStock: {symbol}")
