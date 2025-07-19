@@ -1,0 +1,46 @@
+[
+  {
+    "user_id": "user_001",
+    "user_name": "John Doe",
+    "telegram_id": "12323452",
+    "email": "john.doe@example.com",
+    "access_to_holdings": true,
+    "risk_tolerance": "medium",
+    "investment_horizon": "long",
+    "is_active": true,
+    "last_notification": "2025-07-19T16:20:03.755426"
+  },
+  {
+    "user_id": "user_002",
+    "user_name": "Jane Smith",
+    "telegram_id": "12323452",
+    "email": "jane.smith@example.com",
+    "access_to_holdings": false,
+    "risk_tolerance": "low",
+    "investment_horizon": "medium",
+    "is_active": true,
+    "last_notification": null
+  },
+  {
+    "user_id": "user_003",
+    "user_name": "Mike Johnson",
+    "telegram_id": "456789123",
+    "email": "mike.johnson@example.com",
+    "access_to_holdings": true,
+    "risk_tolerance": "high",
+    "investment_horizon": "short",
+    "is_active": false,
+    "last_notification": null
+  },
+  {
+    "user_id": "test_user_001",
+    "user_name": "Test User",
+    "telegram_id": "999888777",
+    "email": "test@example.com",
+    "access_to_holdings": true,
+    "risk_tolerance": "medium",
+    "investment_horizon": "long",
+    "is_active": false,
+    "last_notification": null
+  }
+]

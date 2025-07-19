@@ -6,20 +6,10 @@ from langsmith import traceable
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
-import sys
 from pydantic import BaseModel
 import json
 from datetime import datetime
-
-# Add the Server directory to Python path to enable absolute imports
-sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
-
-try:
-    from app.utils.telegram import send_predictions_to_telegram, send_alert_to_telegram
-except ImportError:
-    # Fallback for when running as script directly
-    sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
-    from app.utils.telegram import send_predictions_to_telegram, send_alert_to_telegram
+from ..utils.telegram import send_alert_to_telegram, send_predictions_to_telegram
 
 load_dotenv()
 
@@ -40,6 +30,142 @@ clientGemini = wrap_openai(OpenAI(
 bucket_stocks_path = os.path.join(os.path.dirname(__file__), '../resources/bucketStocks.json')
 with open(os.path.abspath(bucket_stocks_path), "r") as f:
     bucketStocks = json.load(f)
+
+def load_users_list():
+    """
+    Load the list of users from users.list.json file.
+    Returns a list of active users with their details.
+    """
+    users_list_path = os.path.join(os.path.dirname(__file__), '../resources/users.list.json')
+    try:
+        with open(os.path.abspath(users_list_path), "r") as f:
+            users_data = json.load(f)
+        
+        # Filter only active users
+        active_users = [user for user in users_data if user.get("is_active", True)]
+        print(f"Loaded {len(active_users)} active users from users list")
+        return active_users
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        print(f"Error loading users list: {e}")
+        return []
+
+def update_user_notification_timestamp(user_telegram_id: str):
+    """
+    Update the last_notification timestamp for a specific user.
+    """
+    users_list_path = os.path.join(os.path.dirname(__file__), '../resources/users.list.json')
+    try:
+        with open(os.path.abspath(users_list_path), "r") as f:
+            users_data = json.load(f)
+        
+        # Update the timestamp for the specific user
+        current_time = datetime.now().isoformat()
+        for user in users_data:
+            if user.get("telegram_id") == user_telegram_id:
+                user["last_notification"] = current_time
+                break
+        
+        # Write back to file
+        with open(os.path.abspath(users_list_path), "w") as f:
+            json.dump(users_data, f, indent=2)
+    
+    except Exception as e:
+        print(f"Error updating notification timestamp: {e}")
+
+def add_new_user(user_data: Dict) -> bool:
+    """
+    Add a new user to the users.list.json file.
+    
+    Args:
+        user_data: Dictionary containing user information
+                  Required: user_id, user_name, telegram_id
+                  Optional: email, access_to_holdings, risk_tolerance, etc.
+    
+    Returns:
+        bool: True if user was added successfully, False otherwise
+    """
+    users_list_path = os.path.join(os.path.dirname(__file__), '../resources/users.list.json')
+    try:
+        # Load existing users
+        try:
+            with open(os.path.abspath(users_list_path), "r") as f:
+                users_data = json.load(f)
+        except FileNotFoundError:
+            users_data = []
+        
+        # Check if user already exists
+        for user in users_data:
+            if user.get("user_id") == user_data.get("user_id") or user.get("telegram_id") == user_data.get("telegram_id"):
+                print(f"User with ID {user_data.get('user_id')} or Telegram ID {user_data.get('telegram_id')} already exists")
+                return False
+        
+        # Set default values for new user
+        new_user = {
+            "user_id": user_data.get("user_id"),
+            "user_name": user_data.get("user_name"),
+            "telegram_id": user_data.get("telegram_id"),
+            "email": user_data.get("email", ""),
+            "access_to_holdings": user_data.get("access_to_holdings", True),
+            "risk_tolerance": user_data.get("risk_tolerance", "medium"),
+            "investment_horizon": user_data.get("investment_horizon", "long"),
+            "is_active": user_data.get("is_active", True),
+            "last_notification": None
+        }
+        
+        # Add new user
+        users_data.append(new_user)
+        
+        # Write back to file
+        with open(os.path.abspath(users_list_path), "w") as f:
+            json.dump(users_data, f, indent=2)
+        
+        print(f"Successfully added new user: {new_user['user_name']} ({new_user['user_id']})")
+        return True
+        
+    except Exception as e:
+        print(f"Error adding new user: {e}")
+        return False
+
+def deactivate_user(user_identifier: str, by_telegram_id: bool = True) -> bool:
+    """
+    Deactivate a user in the users.list.json file.
+    
+    Args:
+        user_identifier: Either user_id or telegram_id
+        by_telegram_id: If True, search by telegram_id, otherwise by user_id
+    
+    Returns:
+        bool: True if user was deactivated successfully, False otherwise
+    """
+    users_list_path = os.path.join(os.path.dirname(__file__), '../resources/users.list.json')
+    try:
+        with open(os.path.abspath(users_list_path), "r") as f:
+            users_data = json.load(f)
+        
+        # Find and deactivate user
+        user_found = False
+        search_field = "telegram_id" if by_telegram_id else "user_id"
+        
+        for user in users_data:
+            if user.get(search_field) == user_identifier:
+                user["is_active"] = False
+                user_found = True
+                print(f"Deactivated user: {user.get('user_name')} ({user.get('user_id')})")
+                break
+        
+        if not user_found:
+            print(f"User with {search_field} {user_identifier} not found")
+            return False
+        
+        # Write back to file
+        with open(os.path.abspath(users_list_path), "w") as f:
+            json.dump(users_data, f, indent=2)
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error deactivating user: {e}")
+        return False
 
 def llm_call(prompt: str, model: ModelType, responseFormat: BaseModel):
     """
@@ -639,22 +765,22 @@ def update_final_values_in_db(state: State) -> State:
 
 def send_notification(state: State) -> State:
     """
-    Send final predictions to user via Telegram.
+    Send final predictions to all users in the users list via Telegram.
     """
     try:
-        # Get user information from state
-        user_telegram_id = state.get("user_telegram_id")
-        user_name = state.get("user_name", "User")
+        # Load users list
+        users_list = load_users_list()
         
-        # Check if we have the required telegram ID
-        if not user_telegram_id:
-            print("❌ No Telegram ID provided - cannot send notification")
-            send_alert_to_telegram(
-                chat_id=os.getenv("ADMIN_TELEGRAM_ID", ""),  # Fallback to admin
-                title="Notification Error",
-                message="User Telegram ID not found - predictions generated but not sent",
-                alert_type="WARNING"
-            )
+        if not users_list:
+            print("❌ No active users found in users list")
+            admin_id = os.getenv("ADMIN_TELEGRAM_ID")
+            if admin_id:
+                send_alert_to_telegram(
+                    chat_id=admin_id,
+                    title="No Users Found",
+                    message="No active users found in users.list.json - predictions generated but not sent",
+                    alert_type="WARNING"
+                )
             return state
         
         # Prepare prediction data for Telegram
@@ -666,40 +792,62 @@ def send_notification(state: State) -> State:
             "news": state.get("news", [])
         }
         
-        # Send predictions to user via Telegram
-        success = send_predictions_to_telegram(
-            chat_id=user_telegram_id,
-            predictions_data=predictions_data,
-            user_name=user_name
-        )
+        # Send notifications to all users
+        successful_notifications = 0
+        failed_notifications = 0
         
-        if success:
-            print(f"✅ Successfully sent predictions to {user_name} ({user_telegram_id})")
+        for user in users_list:
+            user_telegram_id = user.get("telegram_id")
+            user_name = user.get("user_name", "User")
+            user_id = user.get("user_id", "unknown")
             
-            # Log successful notification for admin (optional)
-            admin_id = os.getenv("ADMIN_TELEGRAM_ID")
-            if admin_id and admin_id != user_telegram_id:
-                send_alert_to_telegram(
-                    chat_id=admin_id,
-                    title="Notification Sent",
-                    message=f"Stock predictions successfully sent to {user_name} ({user_telegram_id})",
-                    alert_type="SUCCESS"
-                )
-        else:
-            print(f"❌ Failed to send predictions to {user_name} ({user_telegram_id})")
+            if not user_telegram_id:
+                print(f"⚠️ No Telegram ID for user {user_name} ({user_id}) - skipping")
+                failed_notifications += 1
+                continue
             
-            # Send error notification to admin
-            admin_id = os.getenv("ADMIN_TELEGRAM_ID")
-            if admin_id:
-                send_alert_to_telegram(
-                    chat_id=admin_id,
-                    title="Notification Failed",
-                    message=f"Failed to send stock predictions to {user_name} ({user_telegram_id}). Please check logs for details.",
-                    alert_type="ERROR"
+            try:
+                # Send predictions to user via Telegram
+                success = send_predictions_to_telegram(
+                    chat_id=user_telegram_id,
+                    predictions_data=predictions_data,
+                    user_name=user_name
                 )
+                
+                if success:
+                    print(f"✅ Successfully sent predictions to {user_name} ({user_telegram_id})")
+                    successful_notifications += 1
+                    # Update the user's notification timestamp
+                    update_user_notification_timestamp(user_telegram_id)
+                else:
+                    print(f"❌ Failed to send predictions to {user_name} ({user_telegram_id})")
+                    failed_notifications += 1
+                    
+            except Exception as user_error:
+                print(f"❌ Error sending to {user_name} ({user_telegram_id}): {user_error}")
+                failed_notifications += 1
+        
+        # Send summary to admin
+        admin_id = os.getenv("ADMIN_TELEGRAM_ID")
+        if admin_id:
+            summary_message = (
+                f"📊 Stock Predictions Notification Summary:\n"
+                f"✅ Successful: {successful_notifications}\n"
+                f"❌ Failed: {failed_notifications}\n"
+                f"📋 Total Users: {len(users_list)}"
+            )
+            
+            send_alert_to_telegram(
+                chat_id=admin_id,
+                title="Notification Summary",
+                message=summary_message,
+                alert_type="SUCCESS" if failed_notifications == 0 else "WARNING"
+            )
+        
+        print(f"📊 Notification Summary: {successful_notifications} successful, {failed_notifications} failed out of {len(users_list)} users")
     
     except Exception as e:
-        print(f"❌ Error in send_notification: {e}")
+        print(f"❌ Critical error in send_notification: {e}")
         
         # Send error to admin if available
         admin_id = os.getenv("ADMIN_TELEGRAM_ID")
@@ -873,20 +1021,15 @@ graph_builder.add_edge(
 graph = graph_builder.compile()
 
 # Use the graph
-def call_graph(user_telegram_id: Optional[str] = None, user_name: Optional[str] = None) -> Dict:
+def call_graph() -> Dict:
     """
-    Calls the graph with the user message and returns the AI response.
-    
-    Args:
-        user_telegram_id: The Telegram chat ID to send notifications to
-        user_name: The user's name for personalized messages
+    Calls the graph and returns the AI response.
+    Users are loaded from users.list.json file.
     """
     state = {
         "user_msg": "",
         "ai_msg": "",
         "access_to_holdings": True,  # Assuming we have access to user's holdings
-        "user_telegram_id": user_telegram_id,
-        "user_name": user_name or "User",
     }
     
     result: State = graph.invoke(state)
@@ -903,19 +1046,17 @@ def call_graph(user_telegram_id: Optional[str] = None, user_name: Optional[str] 
 if __name__ == "__main__":
     print("Welcome to the Stock Market AI Assistant!")
     try:
-        user_telegram_id = os.getenv("USER_TELEGRAM_ID")  # Set this in your .env file
-        user_name = os.getenv("USER_NAME", "User")
+        # Load users list to show how many users will receive notifications
+        users_list = load_users_list()
+        print(f"Found {len(users_list)} active users in the system")
         
-        print(f"Running analysis for user: {user_name}")
-        if user_telegram_id:
-            print(f"Notifications will be sent to Telegram ID: {user_telegram_id}")
-        else:
-            print("No Telegram ID provided - predictions will only be displayed in console")
+        for user in users_list:
+            print(f"  - {user.get('user_name', 'Unknown')} (ID: {user.get('user_id', 'N/A')})")
         
-        response = call_graph(
-            user_telegram_id=user_telegram_id,
-            user_name=user_name
-        )
+        print("\nRunning stock market analysis...")
+        
+        response = call_graph()
+        
         print(f"\n=== FINAL STOCK PREDICTIONS ===")
         for symbol, pred in response["final_predictions"].items():
             print(f"\nStock: {symbol}")
@@ -934,5 +1075,16 @@ if __name__ == "__main__":
         print(f"\n=== OVERALL RISK ASSESSMENT ===")
         print(response["overall_risk_assessment"])
         
+        print(f"\n✅ Analysis complete! Notifications sent to all active users via Telegram.")
+        
     except Exception as e:
         print(f"Error found: {e}")
+        # Send error to admin if available
+        admin_id = os.getenv("ADMIN_TELEGRAM_ID")
+        if admin_id:
+            send_alert_to_telegram(
+                chat_id=admin_id,
+                title="System Error",
+                message=f"Critical error in main execution: {str(e)}",
+                alert_type="ERROR"
+            )
